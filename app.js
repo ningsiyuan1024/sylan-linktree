@@ -5,15 +5,7 @@ const nodes=[...document.querySelectorAll('.branch')];
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let paused=reduced, targetRotation=0, renderer, scene, camera, tree, flowers, petals;
 const dialog=document.querySelector('dialog');
-document.querySelectorAll('[data-action]').forEach(el=>el.addEventListener('click',()=>{
- const wechat=el.dataset.action==='wechat';
- document.querySelector('#dialog-title').textContent=wechat?'微信公众号':'交流与合作';
- document.querySelector('#dialog-copy').textContent=wechat?'关于 AI 办公、AI 设计，以及一线实践中的观察与思考。':'如果你也关注 AI 的技术、产品、创意或业务实践，欢迎交换观察、方法与资源。';
- document.querySelector('#contact-caption').textContent=wechat?'在微信中搜索公众号':'微信号';
- document.querySelector('#contact-id').textContent=wechat?'SylanOvO':'NINGSiyuan1024';
- document.querySelector('#contact-note').textContent=wechat?'打开微信，搜索公众号「SylanOvO」。':'在北京，也可以约一次线下 coffee chat。';
- document.querySelector('#copy-status').textContent='';dialog.showModal();
-}));
+document.querySelector('[data-action=wechat]').addEventListener('click',()=>{document.querySelector('#copy-status').textContent='';dialog.showModal();});
 document.querySelector('.close').onclick=()=>dialog.close();
 dialog.addEventListener('click',e=>{const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close()});
 document.querySelector('#copy-contact').onclick=async()=>{const value=document.querySelector('#contact-id').textContent;try{await navigator.clipboard.writeText(value);document.querySelector('#copy-status').textContent='已复制';}catch{document.querySelector('#copy-status').textContent='请长按或选中上方文字复制';}};
@@ -23,7 +15,7 @@ document.querySelector('#motion').onclick=()=>{paused=!paused;document.querySele
 document.querySelector('#reset').onclick=()=>{targetRotation=0;};
 let seed=1368;function rnd(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}function range(a,b){return a+(b-a)*rnd();}
 const V=(x,y,z=0)=>new THREE.Vector3(x,y,z);
-const endpoints=[V(.85,4.58),V(-1.23,4.0),V(1.3,3.42),V(-1.35,2.84),V(1.26,2.26),V(-1.24,1.68),V(1.18,1.1)];
+const endpoints=[V(.85,4.58),V(-1.23,3.78),V(1.3,2.98),V(-1.35,2.18),V(1.26,1.38)];
 const clusterData=[], flowerGroups=[];
 function branch(points,r0,r1){
  const curve=new THREE.CatmullRomCurve3(points), N=96,R=18,frames=curve.computeFrenetFrames(N,false),positions=[],indices=[],colors=[];
@@ -39,7 +31,7 @@ function init(){
  tree=new THREE.Group();scene.add(tree);
  const trunk=branch([V(0,.4),V(-.21,.88,.03),V(.18,1.6,-.03),V(-.27,2.35,.03),V(.2,3.07),V(-.12,3.8,.04),V(.1,4.52)],.23,.026);
  for(let i=0;i<endpoints.length;i++){
-  const end=endpoints[i],start=trunk.getPointAt(.91-i*.125),side=i%2===0?1:-1;
+  const end=endpoints[i],start=trunk.getPointAt(.91-i*.19),side=i%2===0?1:-1;
   const c=branch([start,start.clone().add(V(side*.23,.05,.03)),end.clone().add(V(-side*.48,-.1,.03)),end],.072-i*.001,.009);
   for(let j=0;j<7;j++){
    const t=.28+j*.1,base=c.getPointAt(t),tip=base.clone().add(V(range(-.28,.28),range(.08,.32),range(-.35,.3)));
@@ -74,4 +66,4 @@ function init(){
  function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.04);last=now;if(!paused&&document.visibilityState==='visible'){t+=dt;const pos=fallingGeo.attributes.position;petals.forEach((p,i)=>{p.y-=p.speed*dt;p.x+=Math.sin(t*.65+p.phase)*dt*.06;if(p.y<.1){p.y=4.9;p.x=range(-1.7,1.7);}pos.setXYZ(i,p.x+Math.sin(t+p.phase)*.06,p.y,p.z);});pos.needsUpdate=true;}const idle=paused?0:Math.sin(t*.25)*.035;tree.rotation.y+=((targetRotation+idle)-tree.rotation.y)*.065;positionLabels();renderer.render(scene,camera);}
  document.body.classList.add('ready');requestAnimationFrame(frame);
 }
-try{init();}catch(error){console.error('Tree rendering unavailable',error);document.body.classList.add('ready','no-webgl');document.querySelector('#loading').textContent='';document.querySelector('.garden-hint').textContent='我的文章、作品与联系方式';}
+try{init();}catch(error){console.error('Tree rendering unavailable',error);document.body.classList.add('ready','no-webgl');document.querySelector('#loading').textContent='';}
