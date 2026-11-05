@@ -15,7 +15,7 @@ document.querySelector('#motion').onclick=()=>{paused=!paused;document.querySele
 document.querySelector('#reset').onclick=()=>{targetRotation=0;};
 let seed=1368;function rnd(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}function range(a,b){return a+(b-a)*rnd();}
 const V=(x,y,z=0)=>new THREE.Vector3(x,y,z);
-const endpoints=[V(.85,4.58),V(-1.23,3.78),V(1.3,2.98),V(-1.35,2.18),V(1.26,1.38)];
+const endpoints=[V(.85,4.58),V(-1.23,3.88),V(1.3,3.18),V(-1.35,2.48),V(1.26,1.78),V(-1.2,1.08)];
 const clusterData=[], flowerGroups=[];
 function branch(points,r0,r1){
  const curve=new THREE.CatmullRomCurve3(points), N=96,R=18,frames=curve.computeFrenetFrames(N,false),positions=[],indices=[],colors=[];
@@ -31,7 +31,7 @@ function init(){
  tree=new THREE.Group();scene.add(tree);
  const trunk=branch([V(0,.4),V(-.21,.88,.03),V(.18,1.6,-.03),V(-.27,2.35,.03),V(.2,3.07),V(-.12,3.8,.04),V(.1,4.52)],.23,.026);
  for(let i=0;i<endpoints.length;i++){
-  const end=endpoints[i],start=trunk.getPointAt(.91-i*.19),side=i%2===0?1:-1;
+  const end=endpoints[i],start=trunk.getPointAt(.91-i*.15),side=i%2===0?1:-1;
   const c=branch([start,start.clone().add(V(side*.23,.05,.03)),end.clone().add(V(-side*.48,-.1,.03)),end],.072-i*.001,.009);
   for(let j=0;j<7;j++){
    const t=.28+j*.1,base=c.getPointAt(t),tip=base.clone().add(V(range(-.28,.28),range(.08,.32),range(-.35,.3)));
